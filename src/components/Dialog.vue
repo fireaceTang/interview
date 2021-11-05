@@ -6,10 +6,14 @@
     width="40%"
     :before-close="handleClose"
   >
-    <el-form>
+    <el-form
+      ref="ruleForm"
+      :model="recordInfo"
+      :rules="rules"
+    >
       <el-form-item>
         <el-col :span="11">
-          <el-form-item>
+          <el-form-item prop="brand">
             <el-input
               v-model="recordInfo.brand"
               placeholder="汽车品牌"
@@ -20,7 +24,7 @@
           :span="11"
           :offset="2"
         >
-          <el-form-item>
+          <el-form-item prop="startSign">
             <el-input
               v-model="recordInfo.startSign"
               placeholder="起始标记"
@@ -30,7 +34,7 @@
       </el-form-item>
       <el-form-item>
         <el-col :span="11">
-          <el-form-item>
+          <el-form-item prop="endSign">
             <el-input
               v-model="recordInfo.endSign"
               placeholder="终止标记"
@@ -53,7 +57,7 @@
       </el-form-item>
       <el-form-item>
         <el-col :span="11">
-          <el-form-item>
+          <el-form-item prop="driver">
             <el-input
               v-model="recordInfo.driver"
               placeholder="驾驶人"
@@ -64,7 +68,7 @@
           :span="11"
           :offset="2"
         >
-          <el-form-item>
+          <el-form-item prop="age">
             <el-input
               v-model="recordInfo.age"
               placeholder="年龄"
@@ -74,7 +78,7 @@
       </el-form-item>
       <el-form-item>
         <el-col :span="11">
-          <el-form-item>
+          <el-form-item prop="drivingYears">
             <el-input
               v-model="recordInfo.drivingYears"
               placeholder="驾龄"
@@ -103,7 +107,7 @@
       </el-form-item>
       <el-form-item>
         <el-col :span="11">
-          <el-form-item>
+          <el-form-item prop="condition">
             <el-select
               v-model="recordInfo.condition"
               placeholder="身体状况"
@@ -131,17 +135,18 @@
           </el-form-item>
         </el-col>
       </el-form-item>
+      <el-form-item>
+        <el-button @click="toCancel">
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="toSubmit('ruleForm')"
+        >
+          确 定
+        </el-button>
+      </el-form-item>
     </el-form>
-
-    <el-button @click="toCancel">
-      取 消
-    </el-button>
-    <el-button
-      type="primary"
-      @click="toSubmit()"
-    >
-      确 定
-    </el-button>
   </el-dialog>
 </template>
 
@@ -165,7 +170,32 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      recordInfo: {}, // 记录信息
+      recordInfo: {
+        brand: ''
+      }, // 记录信息
+      rules: {
+        brand: [
+          { required: true, message: '请输入汽车品牌', trigger: 'blur' }
+        ],
+        startSign: [
+          { required: true, message: '请输入起始标志', trigger: 'blur' }
+        ],
+        endSign: [
+          { required: true, message: '请输入终止标志', trigger: 'blur' }
+        ],
+        driver: [
+          { required: true, message: '请输入驾驶人', trigger: 'blur' }
+        ],
+        age: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ],
+        drivingYears: [
+          { required: true, message: '请输入驾龄', trigger: 'blur' }
+        ],
+        condition: [
+          { required: true, message: '请选择身体状况', trigger: 'blur' }
+        ]
+      }, // 表单验证
       standardOptions: [{
         name: '不合格',
         value: 0
@@ -229,6 +259,7 @@ export default {
      * @description 关闭弹窗
      */
     handleClose () {
+      this.$refs.ruleForm.resetFields()
       this.$emit('dialogClose', false)
     },
 
@@ -236,15 +267,23 @@ export default {
      * @description 点击取消
      */
     toCancel () {
+      this.$refs.ruleForm.resetFields()
       this.$emit('dialogClose', false)
     },
 
     /**
-     * @description 点击取消
+     * @description 点击提交
      */
-    toSubmit () {
-      this.$emit('dialogClose', false)
-      this.$emit('submitInfo', this.recordInfo, this.isEdit, this.index)
+    toSubmit (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$emit('dialogClose', false)
+          this.$emit('submitInfo', this.recordInfo, this.isEdit, this.index)
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     }
   }
 }
