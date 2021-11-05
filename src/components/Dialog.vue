@@ -3,6 +3,7 @@
     :title="isEdit ? '编辑页面' : '新增页面'"
     :visible.sync="dialogVisible"
     :show-close="false"
+    :close-on-click-modal="false"
     width="40%"
     :before-close="handleClose"
   >
